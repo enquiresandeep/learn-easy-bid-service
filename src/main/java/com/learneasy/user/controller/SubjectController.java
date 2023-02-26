@@ -33,6 +33,7 @@ public class SubjectController {
         try{
             return ResponseEntity.ok( _subjectService.createSubject(subject));
         }catch(Exception e){
+            e.printStackTrace();
             log.error("BidService error {}", subject.getTitle());
             SubjectDTO errorSubject = new SubjectDTO();
             errorSubject.setErrorMessage("Server Error");

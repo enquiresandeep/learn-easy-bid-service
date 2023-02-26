@@ -35,7 +35,8 @@ public class SubjectService implements  ISubjectService{
     @Override
     public SubjectDTO createSubject(SubjectDTO subjectDTO) throws Exception {
         log.info("SubjectService saveBid "+subjectDTO.getTitle());
-        Subject subject =  subjectRepository.save(subjectMapper.subjectDTOToSubject(subjectDTO) );
+        Subject subjectInput =  subjectMapper.subjectDTOToSubject(subjectDTO);
+        Subject subject =  subjectRepository.save( subjectInput);
         return subjectMapper.subjectToSubjectDTO(subject);
     }
 

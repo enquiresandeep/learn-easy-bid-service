@@ -11,7 +11,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document
-public class Schedule extends BaseEntity{
+public class Schedule {
     private ZonedDateTime startDateTime;
     private ZonedDateTime endDateTime;
 }

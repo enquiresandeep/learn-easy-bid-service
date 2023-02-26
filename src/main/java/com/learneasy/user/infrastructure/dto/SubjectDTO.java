@@ -15,11 +15,11 @@ public class SubjectDTO extends  BaseDTO{
 
     private String subjectId;
 
-    private String studentID;
+    private String studentId;
     private String title;
     private String detail;
     private String comment;
-    private List<SubjectTag> subjectTags;
+    private List<SubjectTag > subjectTags;
     private List<Schedule> openSchedule;
 
 }

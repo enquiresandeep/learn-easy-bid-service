@@ -1,5 +1,6 @@
 package com.learneasy.user.config;
 
+import com.learneasy.user.infrastructure.ZonedDateTimeConverter;
 import com.learneasy.user.infrastructure.mapper.AddressMapper;
 import com.learneasy.user.infrastructure.mapper.PhoneMapper;
 import com.learneasy.user.infrastructure.mapper.BidMapper;
@@ -8,6 +9,9 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
+
+import java.util.Arrays;
 
 @Configuration
 @ComponentScan(basePackages = {"com.learneasy.user"})
@@ -27,5 +31,10 @@ public class AppConfig {
     @Bean
     public AddressMapper addressMapper() {
         return Mappers.getMapper(AddressMapper.class);
+    }
+
+    @Bean
+    public MongoCustomConversions mongoCustomConversions() {
+        return new MongoCustomConversions(Arrays.asList(new ZonedDateTimeConverter()));
     }
 }
