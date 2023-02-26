@@ -19,7 +19,7 @@ public class AddressDTO  extends  BaseDTO{
     private String city;
     private String state;
     private String zipCode;
-    private String studentId;
+    private String bidId;
     private String tutorId;
     private String addressType;
 

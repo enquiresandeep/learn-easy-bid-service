@@ -2,7 +2,8 @@ package com.learneasy.user.config;
 
 import com.learneasy.user.infrastructure.mapper.AddressMapper;
 import com.learneasy.user.infrastructure.mapper.PhoneMapper;
-import com.learneasy.user.infrastructure.mapper.StudentMapper;
+import com.learneasy.user.infrastructure.mapper.BidMapper;
+import com.learneasy.user.infrastructure.mapper.SubjectMapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -12,8 +13,12 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan(basePackages = {"com.learneasy.user"})
 public class AppConfig {
     @Bean
-    public StudentMapper studentMapper() {
-        return Mappers.getMapper(StudentMapper.class);
+    public SubjectMapper subjectMapper() {
+        return Mappers.getMapper(SubjectMapper.class);
+    }
+    @Bean
+    public BidMapper bidMapper() {
+        return Mappers.getMapper(BidMapper.class);
     }
     @Bean
     public PhoneMapper phoneMapper() {

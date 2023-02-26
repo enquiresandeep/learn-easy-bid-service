@@ -1,7 +1,5 @@
-package com.learneasy.user.infrastructure.dto;
+package com.learneasy.user.domain;
 
-import com.learneasy.user.domain.BaseEntity;
-import com.learneasy.user.domain.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,13 +11,17 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudentDTO  extends  BaseDTO{
+@Document
+@Entity
+public class Bid extends BaseEntity{
 
-    private String studentId;
+    @Id
+    private String bidId;
+
     private String firstName;
     private String lastName;
-    private String studentStatus;
-    private List<PhoneDTO> phones;
+    private String bidStatus;
+    private List<Phone> phones;
     private int defaultAddressID;
     private int defaultPaymentProfileId;
 

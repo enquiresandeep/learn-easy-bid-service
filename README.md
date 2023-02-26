@@ -1,1 +1,1 @@
-# learneasy-student-service
+# learneasy-bid-service

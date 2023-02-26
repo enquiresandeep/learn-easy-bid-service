@@ -1,7 +1,7 @@
 package com.learneasy.user.infrastructure;
 
 import com.learneasy.user.domain.Address;
-import com.learneasy.user.domain.Bid;
+import com.learneasy.user.domain.Subject;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,10 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AddressRepository extends MongoRepository<Address,String> {
+public interface SubjectRepository extends MongoRepository<Subject, String> {
+    Optional<Subject> findById(String subjectId);
 
-    Optional<Address> findById(String addressId);
-
-    List<Address> findByBidId(String bidId);
+    List<Subject> findSubjectsByStudentId(String studentId);
 
 }
