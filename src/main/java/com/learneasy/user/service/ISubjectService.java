@@ -13,4 +13,8 @@ public interface ISubjectService {
     public List<SubjectDTO> findSubjectsByStudentId(String studentId) ;
 
     public SubjectDTO updateSubject( SubjectDTO updatedSubject) throws JsonMappingException ;
+
+    public List<SubjectDTO> findSubjectsStudentIdTagName(String studentId,String tagName) ;
+
+
 }

@@ -66,10 +66,16 @@ public class SubjectController {
         return _subjectService.findSubjectBySubjectId(subjectId);
     }
 
-    @GetMapping("/subject/{studentId}")
-    public ResponseEntity<List<SubjectDTO>> findStudentsByStudentId(@PathVariable("id") String studentId){
+    @GetMapping("/findbystudentid/{studentId}")
+    public ResponseEntity<List<SubjectDTO>> findStudentsByStudentId(@PathVariable("studentId") String studentId){
         log.info("SubjectService findStudentsByStudentId "+studentId);
         return ResponseEntity.ok(_subjectService.findSubjectsByStudentId(studentId));
+    }
+
+    @GetMapping("/findbystudentidtagname/{studentId}/{tagname}")
+    public ResponseEntity<List<SubjectDTO>> findStudentsByStudentIdTagname(@PathVariable("studentId") String studentId,@PathVariable("tagname") String tagname){
+        log.info("SubjectService findStudentsByStudentIdTagname "+studentId);
+        return ResponseEntity.ok(_subjectService.findSubjectsStudentIdTagName(studentId,tagname));
     }
 
 

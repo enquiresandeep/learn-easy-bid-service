@@ -1,18 +1,9 @@
 package com.learneasy.user.service;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.learneasy.user.domain.Address;
-import com.learneasy.user.domain.Bid;
 import com.learneasy.user.domain.Subject;
-import com.learneasy.user.infrastructure.AddressRepository;
-import com.learneasy.user.infrastructure.BidRepository;
 import com.learneasy.user.infrastructure.SubjectRepository;
-import com.learneasy.user.infrastructure.dto.AddressDTO;
-import com.learneasy.user.infrastructure.dto.BidDTO;
 import com.learneasy.user.infrastructure.dto.SubjectDTO;
-import com.learneasy.user.infrastructure.mapper.AddressMapper;
-import com.learneasy.user.infrastructure.mapper.BidMapper;
-import com.learneasy.user.infrastructure.mapper.PhoneMapper;
 import com.learneasy.user.infrastructure.mapper.SubjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +39,7 @@ public class SubjectService implements  ISubjectService{
 
     @Override
     public List<SubjectDTO> findSubjectsByStudentId(String studentId) {
-        return subjectMapper.subjectsToSubjectDTOs(subjectRepository.findSubjectsByStudentId(studentId));
+        return subjectMapper.subjectsToSubjectDTOs(subjectRepository.findByStudentId(studentId));
     }
 
     @Override
@@ -57,5 +48,11 @@ public class SubjectService implements  ISubjectService{
                 .orElseThrow(() -> new RuntimeException("Subject not found with id " + updatedSubject.getSubjectId()));
         Subject subject = subjectRepository.save(subjectMapper.subjectDTOToSubject(updatedSubject));
         return  subjectMapper.subjectToSubjectDTO(subject);
+    }
+
+    @Override
+    public List<SubjectDTO> findSubjectsStudentIdTagName(String studentId, String tagName) {
+        return subjectMapper.subjectsToSubjectDTOs(subjectRepository.findSubjectsByTagNameAndStudentId(tagName,studentId));
+
     }
 }

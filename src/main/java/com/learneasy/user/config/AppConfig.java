@@ -1,5 +1,6 @@
 package com.learneasy.user.config;
 
+import com.learneasy.user.infrastructure.DateToZonedDateTimeConverter;
 import com.learneasy.user.infrastructure.ZonedDateTimeConverter;
 import com.learneasy.user.infrastructure.mapper.AddressMapper;
 import com.learneasy.user.infrastructure.mapper.PhoneMapper;
@@ -34,7 +35,9 @@ public class AppConfig {
     }
 
     @Bean
-    public MongoCustomConversions mongoCustomConversions() {
-        return new MongoCustomConversions(Arrays.asList(new ZonedDateTimeConverter()));
+    public MongoCustomConversions mongoCustomConversions1() {
+        return new MongoCustomConversions(Arrays.asList(new ZonedDateTimeConverter(),new DateToZonedDateTimeConverter()));
     }
+
+
 }
