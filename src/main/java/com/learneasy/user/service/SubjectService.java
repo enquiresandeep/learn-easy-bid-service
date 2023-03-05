@@ -2,7 +2,7 @@ package com.learneasy.user.service;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.learneasy.user.domain.Subject;
-import com.learneasy.user.infrastructure.SubjectRepository;
+import com.learneasy.user.infrastructure.db.SubjectRepository;
 import com.learneasy.user.infrastructure.dto.SubjectDTO;
 import com.learneasy.user.infrastructure.mapper.SubjectMapper;
 import lombok.extern.slf4j.Slf4j;

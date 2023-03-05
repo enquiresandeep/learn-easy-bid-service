@@ -1,4 +1,4 @@
-package com.learneasy.user.infrastructure;
+package com.learneasy.user.infrastructure.db;
 
 import org.springframework.core.convert.converter.Converter;
 

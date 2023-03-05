@@ -1,5 +1,6 @@
 package com.learneasy.user.infrastructure.dto;
 
+import com.learneasy.user.domain.Schedule;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,11 +13,8 @@ import java.util.List;
 public class BidDTO  extends  BaseDTO{
 
     private String bidId;
-    private String firstName;
-    private String lastName;
-    private String bidStatus;
-    private List<PhoneDTO> phones;
-    private int defaultAddressID;
-    private int defaultPaymentProfileId;
+    private List<Schedule> schedules;
+    private String subjectId;
+    private String tutorId;
 
 }

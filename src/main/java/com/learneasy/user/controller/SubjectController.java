@@ -1,9 +1,6 @@
 package com.learneasy.user.controller;
 
-import com.learneasy.user.infrastructure.dto.AddressDTO;
-import com.learneasy.user.infrastructure.dto.BidDTO;
 import com.learneasy.user.infrastructure.dto.SubjectDTO;
-import com.learneasy.user.service.IBidService;
 import com.learneasy.user.service.ISubjectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

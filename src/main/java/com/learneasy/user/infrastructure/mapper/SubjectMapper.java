@@ -1,8 +1,6 @@
 package com.learneasy.user.infrastructure.mapper;
 
-import com.learneasy.user.domain.Address;
 import com.learneasy.user.domain.Subject;
-import com.learneasy.user.infrastructure.dto.AddressDTO;
 import com.learneasy.user.infrastructure.dto.SubjectDTO;
 import org.mapstruct.Mapper;
 

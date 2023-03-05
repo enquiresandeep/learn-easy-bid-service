@@ -1,4 +1,4 @@
-package com.learneasy.user.infrastructure;
+package com.learneasy.user.infrastructure.db;
 
 import com.learneasy.user.domain.Subject;
 import org.springframework.data.mongodb.repository.MongoRepository;
