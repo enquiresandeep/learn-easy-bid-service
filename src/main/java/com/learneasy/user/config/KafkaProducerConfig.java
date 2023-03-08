@@ -1,6 +1,7 @@
 package com.learneasy.user.config;
 
 //import com.fasterxml.jackson.databind.JsonSerializer;
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,20 +26,22 @@ public class KafkaProducerConfig {
     private String bootstrapServers;
 
     @Bean
-    public ProducerFactory<String, Object> producerFactory() {
+    public ProducerFactory<String, byte[]> producerFactory() {
         System.out.println("---------------loading producerFactory-------------------START");
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
+        configProps.put("schema.registry.url", "http://localhost:8081");
+
         System.out.println("---------------loading producerFactory-------------------"+bootstrapServers);
         System.out.println("---------------loading producerFactory-------------------END");
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
     @Bean
-    public KafkaTemplate<String, Object> kafkaTemplate() {
-        return new KafkaTemplate<String, Object>(producerFactory());
+    public KafkaTemplate<String, byte[]> kafkaTemplate() {
+        return new KafkaTemplate<String, byte[]>(producerFactory());
     }
 }
 

@@ -1,15 +1,32 @@
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.0.2'
 	id 'io.spring.dependency-management' version '1.1.0'
-}
+//	id "com.github.davidmc24.gradle.plugin.avro" version "1.6.0"
 
+}
+//avro {
+//	createSetters = false
+//	fieldVisibility = "PRIVATE"
+//	stringType = "String"
+////	destinationDirectory = file("$buildDir/generated/main/avro")
+//}
+//
+//sourceSets {
+//	main {
+//		java {
+//			srcDirs = ["$buildDir/generated/main/avro"]
+//		}
+//	}
+//}
 group = 'com.learneasy.bid'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '18'
 
 repositories {
 	mavenCentral()
+	gradlePluginPortal()
 	maven {
 		url "https://packages.confluent.io/maven/"
 	}
@@ -31,6 +48,10 @@ dependencies {
 	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'io.confluent:kafka-schema-registry-client:6.2.9'
 	implementation 'com.networknt:json-schema-validator:1.0.77'
+	implementation 'io.confluent:kafka-avro-serializer:6.2.1'
+	implementation "org.apache.avro:avro:1.11.0"
+	implementation 'javax.ws.rs:javax.ws.rs-api:2.1'
+
 }
 
 tasks.named('test') {

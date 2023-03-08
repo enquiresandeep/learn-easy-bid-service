@@ -6,10 +6,10 @@ spring:
       uri: mongodb://localhost:27017/learneasy
   kafka:
     bootstrap-servers: localhost:9092
-    schema-registry-url: localhost:8081
+    schema-registry-url: http://localhost:8081
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
       retries: 0
       batch-size: 16384
       buffer-memory: 33554432

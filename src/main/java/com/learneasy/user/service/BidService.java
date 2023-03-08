@@ -1,23 +1,24 @@
 package com.learneasy.user.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.avro.le.Schedule;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learneasy.user.domain.Bid;
 import com.learneasy.user.infrastructure.db.BidRepository;
 import com.learneasy.user.infrastructure.dto.BidDTO;
 import com.learneasy.user.infrastructure.mapper.BidMapper;
-import com.networknt.schema.JsonValidator;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.avro.SchemaValidationException;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.header.Headers;
+import org.apache.kafka.common.header.internals.RecordHeader;
+import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class BidService implements  IBidService{
     private BidMapper bidMapper;
 
     @Autowired
-    private  KafkaTemplate<String,Object> kafkaTemplate;
+    private  KafkaTemplate<String, byte[]> kafkaTemplate;
 
     @Autowired
     private  SchemaRegistryClient schemaRegistryClient;
@@ -99,11 +100,44 @@ public class BidService implements  IBidService{
 //
 //    }
 
-    public BidDTO createBidAsync(BidDTO bidDTO) throws IOException {
+    public BidDTO createBidAsync(BidDTO bidDTO) throws Exception {
+        KafkaAvroSerializer serializer = new KafkaAvroSerializer(schemaRegistryClient);
+
+        ParsedSchema schema = schemaRegistryClient.getSchemaBySubjectAndId("le-bid-value", 3);
+        Headers headers = new RecordHeaders();
+        headers.add(new RecordHeader("schema", schema.toString().getBytes()));
+
+        byte[] serializedBid = serializer.serialize("le-bid",headers, mapToBidAvro(bidDTO));
+
+
+        ProducerRecord<String, byte[]> record = new ProducerRecord<>("le-bid",null, serializedBid);
+
+        kafkaTemplate.send(record);
         // Send the Bid message to Kafka
-        String topicName = "le-bid";
-        kafkaTemplate.send(topicName, bidDTO);
+       // String topicName = "le-bid";
+       // kafkaTemplate.send(topicName, bidMapper.bidDTOToBid(bidDTO));
         return bidDTO;
+    }
+
+    public static com.avro.le.Bid mapToBidAvro(BidDTO bidDTO) {
+        List<Schedule> schedules = new ArrayList<>();
+        for (com.learneasy.user.domain.Schedule scheduleDTO : bidDTO.getSchedules()) {
+            Schedule schedule = new Schedule();
+            schedule.setStartDateTime("2022-03-01T10:00:00+00:00");
+            schedule.setEndDateTime("2022-03-01T10:00:00+00:00");
+            schedules.add(schedule);
+        }
+
+
+        com.avro.le.Bid bid = com.avro.le.Bid.newBuilder()
+                .setBidId("123")
+                .setSchedules(schedules)
+                .setSubjectId(bidDTO.getSubjectId())
+                .setTutorId(bidDTO.getTutorId())
+                .build();
+
+
+        return bid;
     }
 
 }
