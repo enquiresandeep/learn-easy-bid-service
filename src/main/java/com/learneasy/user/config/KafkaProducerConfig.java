@@ -1,6 +1,7 @@
 package com.learneasy.user.config;
 
 //import com.fasterxml.jackson.databind.JsonSerializer;
+import com.avro.le.Bid;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -26,7 +27,7 @@ public class KafkaProducerConfig {
     private String bootstrapServers;
 
     @Bean
-    public ProducerFactory<String, byte[]> producerFactory() {
+    public ProducerFactory<String, Bid> producerFactory() {
         System.out.println("---------------loading producerFactory-------------------START");
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -40,8 +41,8 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, byte[]> kafkaTemplate() {
-        return new KafkaTemplate<String, byte[]>(producerFactory());
+    public KafkaTemplate<String, Bid> kafkaTemplate() {
+        return new KafkaTemplate<String, Bid>(producerFactory());
     }
 }
 

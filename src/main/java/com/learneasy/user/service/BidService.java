@@ -20,6 +20,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class BidService implements  IBidService{
     private BidMapper bidMapper;
 
     @Autowired
-    private  KafkaTemplate<String, byte[]> kafkaTemplate;
+    private  KafkaTemplate<String, com.avro.le.Bid> kafkaTemplate;
 
     @Autowired
     private  SchemaRegistryClient schemaRegistryClient;
@@ -103,34 +104,33 @@ public class BidService implements  IBidService{
     public BidDTO createBidAsync(BidDTO bidDTO) throws Exception {
         KafkaAvroSerializer serializer = new KafkaAvroSerializer(schemaRegistryClient);
 
-        ParsedSchema schema = schemaRegistryClient.getSchemaBySubjectAndId("le-bid-value", 3);
-        Headers headers = new RecordHeaders();
-        headers.add(new RecordHeader("schema", schema.toString().getBytes()));
+//        ParsedSchema schema = schemaRegistryClient.getSchemaBySubjectAndId("le-bid-value", 3);
+//        Headers headers = new RecordHeaders();
+//        headers.add(new RecordHeader("schema", schema.toString().getBytes()));
 
-        byte[] serializedBid = serializer.serialize("le-bid",headers, mapToBidAvro(bidDTO));
+        byte[] serializedBid = serializer.serialize("le-bid",null, mapToBidAvro(bidDTO));
 
+        System.out.println(new String(serializedBid));
 
-        ProducerRecord<String, byte[]> record = new ProducerRecord<>("le-bid",null, serializedBid);
+        ProducerRecord<String, com.avro.le.Bid> record = new ProducerRecord<>("le-bid","", mapToBidAvro(bidDTO));
 
         kafkaTemplate.send(record);
-        // Send the Bid message to Kafka
-       // String topicName = "le-bid";
-       // kafkaTemplate.send(topicName, bidMapper.bidDTOToBid(bidDTO));
         return bidDTO;
     }
 
     public static com.avro.le.Bid mapToBidAvro(BidDTO bidDTO) {
         List<Schedule> schedules = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
         for (com.learneasy.user.domain.Schedule scheduleDTO : bidDTO.getSchedules()) {
             Schedule schedule = new Schedule();
-            schedule.setStartDateTime("2022-03-01T10:00:00+00:00");
-            schedule.setEndDateTime("2022-03-01T10:00:00+00:00");
+            schedule.setStartDateTime(scheduleDTO.getStartDateTime().format(formatter));
+            schedule.setEndDateTime(scheduleDTO.getEndDateTime().format(formatter));
             schedules.add(schedule);
         }
 
 
         com.avro.le.Bid bid = com.avro.le.Bid.newBuilder()
-                .setBidId("123")
+                .setBidId("3455")
                 .setSchedules(schedules)
                 .setSubjectId(bidDTO.getSubjectId())
                 .setTutorId(bidDTO.getTutorId())
