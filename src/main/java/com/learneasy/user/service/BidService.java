@@ -7,21 +7,29 @@ import com.learneasy.user.domain.Bid;
 import com.learneasy.user.infrastructure.db.BidRepository;
 import com.learneasy.user.infrastructure.dto.BidDTO;
 import com.learneasy.user.infrastructure.mapper.BidMapper;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
-import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.BinaryEncoder;
+import org.apache.avro.io.DatumWriter;
+import org.apache.avro.io.EncoderFactory;
+import org.apache.avro.specific.SpecificDatumWriter;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.header.Headers;
-import org.apache.kafka.common.header.internals.RecordHeader;
-import org.apache.kafka.common.header.internals.RecordHeaders;
+import org.apache.kafka.common.serialization.Serializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -35,7 +43,7 @@ public class BidService implements  IBidService{
     private BidMapper bidMapper;
 
     @Autowired
-    private  KafkaTemplate<String, com.avro.le.Bid> kafkaTemplate;
+    private  KafkaTemplate<Long, com.avro.le.Bid> kafkaTemplate;
 
     @Autowired
     private  SchemaRegistryClient schemaRegistryClient;
@@ -102,20 +110,66 @@ public class BidService implements  IBidService{
 //    }
 
     public BidDTO createBidAsync(BidDTO bidDTO) throws Exception {
-        KafkaAvroSerializer serializer = new KafkaAvroSerializer(schemaRegistryClient);
+//        KafkaAvroSerializer serializer = new KafkaAvroSerializer(schemaRegistryClient);
 
-//        ParsedSchema schema = schemaRegistryClient.getSchemaBySubjectAndId("le-bid-value", 3);
+ //       ParsedSchema schema = schemaRegistryClient.getSchemaBySubjectAndId("le-bid-value", 3);
 //        Headers headers = new RecordHeaders();
 //        headers.add(new RecordHeader("schema", schema.toString().getBytes()));
 
-        byte[] serializedBid = serializer.serialize("le-bid",null, mapToBidAvro(bidDTO));
+   //     byte[] serializedBid = serializer.serialize("le-bid",null, mapToBidAvro(bidDTO));
 
-        System.out.println(new String(serializedBid));
+     //   System.out.println(new String(serializedBid));
 
-        ProducerRecord<String, com.avro.le.Bid> record = new ProducerRecord<>("le-bid","", mapToBidAvro(bidDTO));
+        ProducerRecord<Long, com.avro.le.Bid> record = new ProducerRecord<Long, com.avro.le.Bid>("le-bid",123456L, mapToBidAvro(bidDTO));
 
         kafkaTemplate.send(record);
+        kafkaTemplate.flush();
         return bidDTO;
+    }
+
+    public class BidSerializer implements Serializer<com.avro.le.Bid> {
+
+        @Override
+        public byte[] serialize(String topic, com.avro.le.Bid data) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            try {
+                BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(out, null);
+                DatumWriter<com.avro.le.Bid> writer = new SpecificDatumWriter<>(com.avro.le.Bid.class);
+                writer.write(data, encoder);
+                encoder.flush();
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return out.toByteArray();
+        }
+
+        @Override
+        public void close() {
+
+        }
+    }
+
+    public static GenericRecord buildRecord() throws Exception {
+        // avro schema avsc file path.
+        String schemaPath = "/Users/sandeepchandan/Documents/SandeepChandan/SHIVA WS/learneasy/bid-mgmt-service/src/main/avro/bid.avsc";
+        // avsc json string.
+        String schemaString = null;
+
+        FileInputStream inputStream = new FileInputStream(schemaPath);
+        try {
+            schemaString = new String(IOUtils.toByteArray(inputStream));
+        } finally {
+            inputStream.close();
+        }
+        // avro schema.
+        Schema schema = new Schema.Parser().parse(schemaString);
+        // generic record for page-view-event.
+        GenericData.Record record = new GenericData.Record(schema);
+        // put the elements according to the avro schema.
+        record.put("itemId", "any-item-id");
+
+        return record;
     }
 
     public static com.avro.le.Bid mapToBidAvro(BidDTO bidDTO) {
@@ -130,7 +184,7 @@ public class BidService implements  IBidService{
 
 
         com.avro.le.Bid bid = com.avro.le.Bid.newBuilder()
-                .setBidId("3455")
+                .setBidId("")
                 .setSchedules(schedules)
                 .setSubjectId(bidDTO.getSubjectId())
                 .setTutorId(bidDTO.getTutorId())

@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BidMgmtServiceApplication {
 
 	public static void main(String[] args) {
+		System.setProperty("spring.devtools.restart.enabled", "false");
+
 		SpringApplication.run(BidMgmtServiceApplication.class, args);
 	}
 

@@ -15,7 +15,7 @@ spring:
       buffer-memory: 33554432
     consumer:
       bootstrap-servers: localhost:9092
-      group-id: bid-group-id
+      group-id: bid-group-id4
       auto-offset-reset: earliest
       properties:
         schema.registry.url: http://localhost:8081
