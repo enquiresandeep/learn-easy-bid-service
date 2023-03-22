@@ -42,10 +42,9 @@ public class RunSchemaTest {
                 .url("http://localhost:8081/subjects/le-bid/versions")
                 .build();
         String output = "";
-       // output = client.newCall(request).execute().schemaBodyRequest().string();
-        System.out.println(output);
+       // output = client.newCall(request).execute().body().toString();
+        //System.out.println(output);
 
-        if(true)return;
         //LIST ALL SCHEMAS
         request = new Request.Builder()
                 .url("http://localhost:8081/subjects")
@@ -65,7 +64,7 @@ public class RunSchemaTest {
 
         //SHOW VERSION 6 OF EMPLOYEE
         request = new Request.Builder()
-                .url("http://localhost:8081/subjects/le-bid/versions/6")
+                .url("http://localhost:8081/subjects/le-bid/versions/1")
                 .build();
 
         output = client.newCall(request).execute().body().string();
@@ -73,7 +72,7 @@ public class RunSchemaTest {
 
         //SHOW THE SCHEMA WITH ID 3
         request = new Request.Builder()
-                .url("http://localhost:8081/schemas/ids/3")
+                .url("http://localhost:8081/schemas/ids/1")
                 .build();
 
         output = client.newCall(request).execute().body().string();

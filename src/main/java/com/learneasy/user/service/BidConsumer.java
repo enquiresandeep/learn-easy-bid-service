@@ -1,8 +1,16 @@
 package com.learneasy.user.service;
 
 import com.avro.le.Bid;
+import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
+import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericContainer;
+import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.io.*;
 import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificDatumWriter;
@@ -36,13 +44,44 @@ public class BidConsumer {
     }
     public static class BidDeserializer implements Deserializer<Bid> {
 
-        public BidDeserializer(){
+//        public BidDeserializer(){
+//
+//        }
+        private final KafkaAvroDeserializer avroDeserializer;
 
+        public BidDeserializer() {
+            Map<String, Object> configs = new HashMap<>();
+            configs.put("schema.registry.url", "http://localhost:8081");
+            configs.put("specific.avro.reader", true);
+            avroDeserializer = new KafkaAvroDeserializer(new CachedSchemaRegistryClient("http://localhost:8081", 100), configs);
         }
+        //        @Override
+//        public com.avro.le.Bid deserialize(String topic, byte[] data) {
+//            DatumReader<Bid> reader = new SpecificDatumReader<>(com.avro.le.Bid.class);
+//            BinaryDecoder decoder = DecoderFactory.get().binaryDecoder(data, null);
+//            try {
+//                return reader.read(null, decoder);
+//            } catch (IOException e) {
+//                throw new SerializationException("Error deserializing Avro message", e);
+//            }
+//        }
+
         @Override
-        public com.avro.le.Bid deserialize(String topic, byte[] data) {
-            DatumReader<Bid> reader = new SpecificDatumReader<>(com.avro.le.Bid.class);
-            BinaryDecoder decoder = DecoderFactory.get().binaryDecoder(data, null);
+        public Bid deserialize(String topic, byte[] data) {
+            Object genericRecord = avroDeserializer.deserialize(topic, data);
+//            if(true) return (Bid)genericRecord;
+            DatumReader<Bid> reader = new SpecificDatumReader<>(Bid.class);
+            Decoder decoder = null;
+            try {
+                //in above example data directly comes as byte array
+                // and no connection to avro registry to deserialize
+                //here it forces to connect to avro registry
+                decoder = DecoderFactory.get().binaryDecoder(genericRecordToByteArray(genericRecord), null);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (RestClientException e) {
+                throw new RuntimeException(e);
+            }
             try {
                 return reader.read(null, decoder);
             } catch (IOException e) {
@@ -50,9 +89,21 @@ public class BidConsumer {
             }
         }
 
+        private byte[] genericRecordToByteArray(Object genericRecord) throws IOException, RestClientException {
+            String schemaName = ((GenericContainer) genericRecord).getSchema().getFullName();
+            String schemaRegistryUrl = "http://localhost:8081"; // replace with the URL of your schema registry
+            SchemaRegistryClient schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryUrl, 100);
+            int schemaId = schemaRegistry.getLatestSchemaMetadata("le-bid-value").getId();
+            Schema schema = schemaRegistry.getByID(schemaId);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(baos, null);
+            DatumWriter<Object> writer = new GenericDatumWriter<>(schema);
+            writer.write(genericRecord, encoder);
+            encoder.flush();
+            return baos.toByteArray();        }
         @Override
         public void close() {
-
+            avroDeserializer.close();
         }
     }
 
@@ -71,6 +122,8 @@ public class BidConsumer {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "bid-group-id9");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+       // props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getName());
+        props.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://localhost:8081");
 
         // Configure the value deserializer using ErrorHandlingDeserializer
         Deserializer<Bid> valueDeserializer = new BidDeserializer();

@@ -1,7 +1,7 @@
 
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.0.2'
+	id 'org.springframework.boot' version '3.0.4'
 	id 'io.spring.dependency-management' version '1.1.0'
 //	id "com.github.davidmc24.gradle.plugin.avro" version "1.6.0"
 
@@ -32,34 +32,41 @@ repositories {
 	}
 }
 
+ext {
+	set('springCloudVersion', "2022.0.1")
+}
+
 dependencies {
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
-	//implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
 	implementation 'org.mapstruct:mapstruct:1.5.0.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.0.Final'
 	implementation 'org.springframework.kafka:spring-kafka'
-	implementation 'io.confluent:kafka-schema-registry-client:6.2.9'
-	implementation 'com.networknt:json-schema-validator:1.0.77'
-	implementation 'io.confluent:kafka-avro-serializer:6.2.1'
+	implementation('com.networknt:json-schema-validator:1.0.77') {
+		exclude group: 'javax.ws.rs', module: 'javax.ws.rs-api'
+	}
 	implementation "org.apache.avro:avro:1.11.0"
-	implementation 'javax.ws.rs:javax.ws.rs-api:2.1'
-// https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
+	implementation 'javax.ws.rs:javax.ws.rs-api:2.1.1'
 	implementation 'com.squareup.okhttp3:okhttp:3.2.0'
 	implementation 'org.apache.httpcomponents:httpclient:4.5.4'
-//Thanks for using https://jar-download.com
-// https://mvnrepository.com/artifact/com.google.code.gson/gson
 	implementation 'com.google.code.gson:gson:2.7'
-
+	implementation 'io.confluent:kafka-streams-avro-serde:7.3.2'
+	implementation group: 'org.apache.kafka', name: 'kafka-streams', version: '3.3.2'
 }
 
+/*dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}*/
 tasks.named('test') {
 	useJUnitPlatform()
 }

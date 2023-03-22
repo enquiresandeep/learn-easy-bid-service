@@ -2,6 +2,7 @@ package com.learneasy.user.config;
 
 //import com.fasterxml.jackson.databind.JsonSerializer;
 import com.avro.le.Bid;
+import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
 import org.apache.avro.io.BinaryEncoder;
@@ -41,7 +42,8 @@ public class KafkaProducerConfig {
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.CLIENT_ID_CONFIG, "AvroProducer");
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class.getName());
-        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaProducerConfig.BidSerializer.class.getName());
+   //     configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaProducerConfig.BidSerializer.class.getName());
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
         configProps.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://localhost:8081");
 
         System.out.println("---------------loading producerFactory-------------------"+bootstrapServers);
